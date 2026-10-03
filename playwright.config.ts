@@ -1,2 +1,5 @@
 import { defineConfig } from '@playwright/test';
-export default defineConfig({testDir:'./tests',use:{baseURL:'http://127.0.0.1:4173',headless:true},webServer:{command:'npx vite preview --host 127.0.0.1 --port 4173',url:'http://127.0.0.1:4173',reuseExistingServer:!process.env.CI},timeout:45000});
+import {env} from 'node:process';
+const port=Number(env.HARNESS_TEST_PORT??4173);
+const baseURL=`http://127.0.0.1:${port}`;
+export default defineConfig({testDir:'./tests',use:{baseURL,headless:true},webServer:{command:`npx vite preview --host 127.0.0.1 --port ${port} --strictPort`,url:baseURL,reuseExistingServer:false},timeout:45000});

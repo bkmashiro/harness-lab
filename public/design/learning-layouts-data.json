@@ -1,0 +1,214 @@
+{
+  "revision": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+  "origin": "模型响应来自本地预设脚本；Pi harness、协议解析和文件工具实际执行。此预览回放采集的数据。",
+  "call": {
+    "type": "toolCall",
+    "id": "call_5d80a3a1-6707-44d1-85c0-47354a941054",
+    "name": "read_file",
+    "arguments": {
+      "path": "/src/sum.js"
+    }
+  },
+  "assistantMessage": {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "toolCall",
+        "id": "call_5d80a3a1-6707-44d1-85c0-47354a941054",
+        "name": "read_file",
+        "arguments": {
+          "path": "/src/sum.js"
+        }
+      }
+    ],
+    "api": "openai-completions",
+    "provider": "openai",
+    "model": "gpt-4.1-mini",
+    "usage": {
+      "input": 0,
+      "output": 0,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "totalTokens": 0,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "total": 0
+      }
+    },
+    "stopReason": "toolUse",
+    "timestamp": 1791023300241,
+    "responseId": "chatcmpl-fixture",
+    "responseModel": "fixture",
+    "rawStopReason": "tool_calls",
+    "thinkingLevel": "off"
+  },
+  "toolResult": {
+    "role": "toolResult",
+    "toolCallId": "call_5d80a3a1-6707-44d1-85c0-47354a941054",
+    "toolName": "read_file",
+    "content": [
+      {
+        "type": "text",
+        "text": "export function sum(a, b) {\n  return a - b;\n}\n"
+      }
+    ],
+    "details": {
+      "text": "export function sum(a, b) {\n  return a - b;\n}\n"
+    },
+    "isError": false,
+    "timestamp": 1791023300249
+  },
+  "schema": {
+    "type": "object",
+    "required": [
+      "path"
+    ],
+    "properties": {
+      "path": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    }
+  },
+  "events": [
+    {
+      "id": "event-34",
+      "seq": 34,
+      "kind": "message_end",
+      "title": "模型提出调用",
+      "data": {
+        "type": "message_end",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "toolCall",
+              "id": "call_5d80a3a1-6707-44d1-85c0-47354a941054",
+              "name": "read_file",
+              "arguments": {
+                "path": "/src/sum.js"
+              }
+            }
+          ],
+          "api": "openai-completions",
+          "provider": "openai",
+          "model": "gpt-4.1-mini",
+          "usage": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "totalTokens": 0,
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          },
+          "stopReason": "toolUse",
+          "timestamp": 1791023300241,
+          "responseId": "chatcmpl-fixture",
+          "responseModel": "fixture",
+          "rawStopReason": "tool_calls",
+          "thinkingLevel": "off"
+        }
+      },
+      "description": "助手消息包含一次 read_file 请求，参数和调用 ID 如下。"
+    },
+    {
+      "id": "event-35",
+      "seq": 35,
+      "kind": "tool_execution_start",
+      "title": "开始处理请求",
+      "data": {
+        "type": "tool_execution_start",
+        "toolCallId": "call_5d80a3a1-6707-44d1-85c0-47354a941054",
+        "toolName": "read_file",
+        "args": {
+          "path": "/src/sum.js"
+        }
+      },
+      "description": "harness 开始处理这次调用。工具查找和参数校验发生在这个事件之后。"
+    },
+    {
+      "id": "event-36",
+      "seq": 36,
+      "kind": "read",
+      "title": "读取文件",
+      "data": {
+        "path": "/src/sum.js",
+        "content": "export function sum(a, b) {\n  return a - b;\n}\n"
+      },
+      "description": "read_file 已取得虚拟文件的内容。这个事件记录了路径与读取结果。"
+    },
+    {
+      "id": "event-37",
+      "seq": 37,
+      "kind": "tool_execution_end",
+      "title": "工具返回",
+      "data": {
+        "type": "tool_execution_end",
+        "toolCallId": "call_5d80a3a1-6707-44d1-85c0-47354a941054",
+        "toolName": "read_file",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "export function sum(a, b) {\n  return a - b;\n}\n"
+            }
+          ],
+          "details": {
+            "text": "export function sum(a, b) {\n  return a - b;\n}\n"
+          }
+        },
+        "isError": false
+      },
+      "description": "工具处理结束，返回值和 isError 标记记录在当前结果中。"
+    },
+    {
+      "id": "event-39",
+      "seq": 39,
+      "kind": "message_end",
+      "title": "结果消息",
+      "data": {
+        "type": "message_end",
+        "message": {
+          "role": "toolResult",
+          "toolCallId": "call_5d80a3a1-6707-44d1-85c0-47354a941054",
+          "toolName": "read_file",
+          "content": [
+            {
+              "type": "text",
+              "text": "export function sum(a, b) {\n  return a - b;\n}\n"
+            }
+          ],
+          "details": {
+            "text": "export function sum(a, b) {\n  return a - b;\n}\n"
+          },
+          "isError": false,
+          "timestamp": 1791023300249
+        }
+      },
+      "description": "toolResult 消息沿用原 toolCallId，并进入后续模型请求的历史。"
+    }
+  ],
+  "workspace": {
+    "path": "/src/sum.js",
+    "before": {
+      "/src/sum.js": "export function sum(a, b) {\n  return a - b;\n}\n",
+      "/README.md": "修复 sum(a, b)，让它返回两个数的和。运行内置测试确认结果。\n"
+    },
+    "after": {
+      "/src/sum.js": "export function sum(a, b) {\n  return a + b;\n}\n",
+      "/README.md": "修复 sum(a, b)，让它返回两个数的和。运行内置测试确认结果。\n"
+    },
+    "writeCallId": "call_5f658727-53b9-4ec5-9fea-76dba88d7f9f",
+    "writeEventId": "event-71"
+  }
+}

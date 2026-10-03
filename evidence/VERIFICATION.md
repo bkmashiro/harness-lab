@@ -6,7 +6,7 @@ Executed locally on macOS with Node 26.7.0. Model/runtime verification used loca
 
 - `npm run check`: 0 errors, 0 warnings.
 - `npm test`: 51 tests passed across 9 files.
-- `npm run test:e2e`: 19 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
+- `npm run test:e2e`: 21 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
 - `npm run build`: passed, producing a static `dist/` tree.
 - `npm audit --omit=dev`: 0 vulnerabilities at dependency setup; lockfile is committed with the product.
 
@@ -31,6 +31,12 @@ Six units provide objectives, prerequisites, field explanations, source excerpts
 The three lesson excerpts were compared to fixed upstream source after removing common indentation and match lines 715–726, 829–840 and 922–935 of `packages/agent/src/agent-loop.ts`. Source inspection also confirmed that `tool_execution_start` precedes preparation/validation (lines 541–549); the diagram and lesson describe it as request processing, with execution occurring later.
 
 Remaining eight chapters have concise explanations and projections, not the full six-unit teaching treatment.
+
+## Chapter-specific design preview
+
+`public/design/learning-layouts.html` is an isolated layout preview. It presents request fields, five recorded read-call events and before/after workspace content with fixed-size HTML text. The JSON capture was produced by the current Pi runtime with the default scripted provider. Request/result IDs and the write snapshot change were checked during capture. Two added browser tests cover field selection, local step controls, file comparison, no global slider, and visible code at least 14px with 390px reflow. Production course components are unchanged.
+
+Browser verification uses a fresh Vite preview server with strict port selection; `HARNESS_TEST_PORT` can isolate it from other local applications.
 
 ## Scope and limits
 

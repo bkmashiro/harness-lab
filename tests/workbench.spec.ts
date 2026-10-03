@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test('default simulation executes the real harness and exposes its trace', async ({ page }) => {
+test('default simulation executes the real harness and exposes its trace', async ({ page,baseURL }) => {
   const errors:string[]=[];
   page.on('pageerror', error => errors.push(error.message));
   const externalRequests:string[]=[];
-  page.on('request', request => {if (!request.url().startsWith('http://127.0.0.1:4173')) externalRequests.push(request.url());});
+  page.on('request', request => {if (!request.url().startsWith(baseURL!)) externalRequests.push(request.url());});
   await page.goto('/');
   await expect(page.getByTestId('system-diagram')).toBeVisible();
   await expect(page.getByTestId('run-status')).toContainText(/completed|完成/, {timeout:30000});
@@ -28,7 +28,7 @@ test('default simulation executes the real harness and exposes its trace', async
   await page.screenshot({path:'docs/screenshots/workbench-diff.png',fullPage:true});
 });
 
-test('Responses protocol also completes without a key', async ({ page }) => {
+test('Responses protocol also completes without a key', async ({ page,baseURL }) => {
   await page.goto('/');
   await expect(page.getByTestId('run-status')).toContainText(/completed|完成/,{timeout:30000});
   await page.getByTestId('settings-button').click();
@@ -43,7 +43,7 @@ test('Responses protocol also completes without a key', async ({ page }) => {
   await page.evaluate(()=>window.scrollTo(0,0));
 });
 
-test('390px layout remains readable without document overflow', async ({ page }) => {
+test('390px layout remains readable without document overflow', async ({ page,baseURL }) => {
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');
   await expect(page.getByTestId('run-status')).toContainText(/completed|完成/,{timeout:30000});
