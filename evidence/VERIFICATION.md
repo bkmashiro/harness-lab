@@ -6,7 +6,7 @@ Executed locally on macOS with Node 26.7.0. Model/runtime verification used loca
 
 - `npm run check`: 0 errors, 0 warnings.
 - `npm test`: 51 tests passed across 9 files.
-- `npm run test:e2e`: 21 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
+- `npm run test:e2e`: 23 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
 - `npm run build`: passed, producing a static `dist/` tree.
 - `npm audit --omit=dev`: 0 vulnerabilities at dependency setup; lockfile is committed with the product.
 
@@ -34,9 +34,13 @@ Remaining eight chapters have concise explanations and projections, not the full
 
 ## Chapter-specific design preview
 
-`public/design/learning-layouts.html` is an isolated layout preview. It presents request fields, five recorded read-call events and before/after workspace content with fixed-size HTML text. The JSON capture was produced by the current Pi runtime with the default scripted provider. Request/result IDs and the write snapshot change were checked during capture. Two added browser tests cover field selection, local step controls, file comparison, no global slider, and visible code at least 14px with 390px reflow. Production course components are unchanged.
+`public/design/learning-layouts.html` is an isolated layout preview. It presents request fields, five recorded read-call events and before/after workspace content with fixed-size HTML text. The JSON capture was produced by the current Pi runtime with the default scripted provider. Request/result IDs and the write snapshot change were checked during capture. Two added browser tests cover field selection, local step controls, file comparison, no global slider, and visible code at least 16px with 390px reflow. Production course components are unchanged.
 
 Browser verification uses a fresh Vite preview server with strict port selection; `HARNESS_TEST_PORT` can isolate it from other local applications.
+
+## Typography
+
+The preview now uses an 1840px maximum content width, 18px body text and 16px code. A 220,360-byte self-hosted subset of Noto Sans Mono CJK SC covers the current course text. The course and preview share this font; explicit Chinese sans-serif fallbacks replace the generic monospace fallback. Chromium platform-font inspection confirmed that mixed Latin/Chinese code uses the custom Harness family. Tests also check 1920px landscape usage and 390px reflow. The font asset is prebuilt; deployment has no new Python or external-font dependency.
 
 ## Scope and limits
 

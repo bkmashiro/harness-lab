@@ -1,0 +1,3 @@
+@font-face{font-family:"Harness Code Mono";src:url("./harness-code-mono.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap}
+:root{--font-code:"Harness Code Mono","Cascadia Mono","Consolas","Noto Sans Mono CJK SC","Microsoft YaHei","PingFang SC",sans-serif}
+pre,code,kbd,samp,textarea.code-editor,.field-value,.file-path,.file-tabs button{font-family:var(--font-code)!important;font-variant-ligatures:none}

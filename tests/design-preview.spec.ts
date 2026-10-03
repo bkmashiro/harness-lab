@@ -23,7 +23,7 @@ test('preview preserves text size instead of shrinking a canvas',async({page})=>
   await page.getByTestId('topic-'+topic).click();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(391);
   const sizes=await page.locator('main pre:visible,main code:visible').evaluateAll(nodes=>nodes.map(n=>parseFloat(getComputedStyle(n).fontSize)));
-  expect(sizes.length).toBeGreaterThan(0);expect(Math.min(...sizes)).toBeGreaterThanOrEqual(14);
+  expect(sizes.length).toBeGreaterThan(0);expect(Math.min(...sizes)).toBeGreaterThanOrEqual(16);
  }
  await page.screenshot({path:'docs/screenshots/design-mobile.png',fullPage:true});
 });
