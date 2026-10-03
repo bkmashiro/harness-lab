@@ -4,7 +4,7 @@ test('desktop chapter stays inside the viewport and does not expose a full trace
  await page.setViewportSize({width:1280,height:800});await page.goto('/');await expect(page.getByTestId('run-status')).toContainText('已完成',{timeout:30000});
  expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBeLessThanOrEqual(801);
  await expect(page.locator('.sidebar')).toHaveCount(0);
- expect(await page.locator('.lesson-copy p').evaluate(e=>e.getBoundingClientRect().height)).toBeLessThan(160);
+ expect(await page.locator('.learn-panel p').first().evaluate(e=>e.getBoundingClientRect().height)).toBeLessThan(160);
  await expect(page.getByTestId('system-diagram')).toBeInViewport();
  await expect(page.getByTestId('chapter-select')).toBeVisible();
  await page.getByTestId('right-tab-events').click();

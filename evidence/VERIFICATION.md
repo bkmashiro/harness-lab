@@ -1,12 +1,12 @@
 # Verification record
 
-Executed locally on macOS with Node 26.7.0. No paid model calls, remote publication or GitHub Actions were used.
+Executed locally on macOS with Node 26.7.0. Model/runtime verification used local fixtures. No paid model calls or GitHub Actions were used.
 
 ## Gates executed
 
 - `npm run check`: 0 errors, 0 warnings.
-- `npm test`: 34 tests passed across 6 files.
-- `npm run test:e2e`: 15 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
+- `npm test`: 51 tests passed across 9 files.
+- `npm run test:e2e`: 19 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
 - `npm run build`: passed, producing a static `dist/` tree.
 - `npm audit --omit=dev`: 0 vulnerabilities at dependency setup; lockfile is committed with the product.
 
@@ -23,6 +23,14 @@ The original 1280×800 page had document height 2064px. It now uses two viewport
 3. Raw live observation originally redacted each read independently, allowing a known credential split across fetch reads to be reconstructed. A new test reproduced the full credential in concatenated observations. The observer now retains a possible credential prefix across reads, removes known complete matches before emitting, and explicitly describes observation fragments as potentially delayed/merged. Original bytes sent to the Pi parser are unchanged.
 4. Returned messages and event file snapshots are scrubbed of the configured credential. Runtime tests cover user-message and file-snapshot echoes as well as exported trace coverage in the browser.
 5. A global `.workspace` layout selector also styled graph/legend elements bearing the workspace lane. Renamed the layout to `.workbench-layout`, keeping lane identities unchanged.
+
+## First module sample
+
+Six units provide objectives, prerequisites, field explanations, source excerpts, a read-only exercise, three graded questions and a summary. Browser tests cover wrong predictions, actual missing-file errors, empty-path schema rejection, quiz retry, completion and refresh persistence. Chat and Responses integration tests both execute exactly one read call without changing files. Course and exercise event collections remain separate, including file snapshots.
+
+The three lesson excerpts were compared to fixed upstream source after removing common indentation and match lines 715–726, 829–840 and 922–935 of `packages/agent/src/agent-loop.ts`. Source inspection also confirmed that `tool_execution_start` precedes preparation/validation (lines 541–549); the diagram and lesson describe it as request processing, with execution occurring later.
+
+Remaining eight chapters have concise explanations and projections, not the full six-unit teaching treatment.
 
 ## Scope and limits
 

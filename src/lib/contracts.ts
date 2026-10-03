@@ -1,7 +1,7 @@
 export type Lane = 'user'|'context'|'provider'|'parser'|'harness'|'tools'|'workspace'|'session';
 export type Protocol = 'chat'|'responses';
-export type Scenario = 'repair'|'invalid-args'|'provider-error'|'failed-test';
-export interface Settings { mode:'demo'|'live'; protocol:Protocol; baseUrl:string; apiKey:string; model:string; delayMs:number; scenario:Scenario; toolExecution:'sequential'|'parallel'; }
+export type Scenario = 'repair'|'invalid-args'|'provider-error'|'failed-test'|'read-once';
+export interface Settings { mode:'demo'|'live'; protocol:Protocol; baseUrl:string; apiKey:string; model:string; delayMs:number; scenario:Scenario; demoReadPath?:string; toolExecution:'sequential'|'parallel'; }
 export interface TraceEvent { id:string; seq:number; at:number; lane:Lane; kind:string; title:string; data:unknown; files:Record<string,string>; source?:string; }
 export interface RunResult { events:TraceEvent[]; files:Record<string,string>; messages:unknown[]; status:'completed'|'cancelled'|'error'; error?:string; }
 export type Emit = (lane:Lane,kind:string,title:string,data:unknown,source?:string)=>void;

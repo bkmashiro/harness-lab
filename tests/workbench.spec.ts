@@ -37,9 +37,9 @@ test('Responses protocol also completes without a key', async ({ page }) => {
   await page.getByTestId('settings-button').click();
   await page.getByTestId('run-button').click();
   await expect(page.getByTestId('run-status')).toContainText(/completed|完成/,{timeout:30000});
-  expect(await page.getByTestId('timeline-event').count()).toBe(3);
-  await page.getByTestId('full-trace-toggle').check();
+  await expect(page.getByTestId('full-trace-toggle')).toBeChecked();
   expect(await page.getByTestId('timeline-event').count()).toBeGreaterThan(15);
+  await expect(page.getByTestId('timeline-event').filter({hasText:'responses'}).first()).toBeVisible();
   await page.evaluate(()=>window.scrollTo(0,0));
 });
 

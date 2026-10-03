@@ -12,8 +12,12 @@ export function eventFlow(event:TraceEvent):DataFlow|null{
  if(kind==='response')return {from:'provider',to:'parser',operation:'接收响应'};
  if(kind==='stream_event')return {from:'parser',to:'harness',operation:'解析为统一事件'};
  if(kind==='api_test_result')return {from:'provider',to:'parser',operation:'单次 API 观测'};
- if(kind==='tool_execution_start')return {from:'harness',to:'tools',operation:'校验后调度工具'};
- if(kind==='tool_execution_end')return {from:'tools',to:'harness',operation:'返回工具结果'};
+ if(kind==='tool_execution_start')return {from:'harness',to:'harness',operation:'开始处理工具请求'};
+ if(kind==='tool_execution_end'){
+  const errorText=((event.data as any)?.result?.content??[]).map((part:any)=>part.text??'').join('\n');
+  if((event.data as any)?.isError&&!/^File not found:/i.test(errorText)&&/validation|validate|invalid|minLength|Tool .* not found|truncat/i.test(errorText))return {from:'harness',to:'harness',operation:'工具请求被拒绝'};
+  return {from:'tools',to:'harness',operation:'返回工具结果'};
+ }
  if(kind==='read')return {from:'workspace',to:'tools',operation:'读取文件内容'};
  if(kind==='write')return {from:'tools',to:'workspace',operation:'写入文件内容'};
  if(kind==='test')return {from:'workspace',to:'tools',operation:'受限算术测试结果'};

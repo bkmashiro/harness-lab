@@ -17,7 +17,7 @@ export const chapters: Chapter[] = [
     subtitle: "一次 read_file 调用：模型提出请求，harness 启动工具。",
     body: [
       "模型先返回一个结构化工具调用：read_file，参数是 /src/sum.js。第一步展示完整助手消息，找出调用的 name、arguments 和 id。",
-      "harness 收到消息后，找到 read_file 实现、检查参数并启动工具。第二步展示实际工具启动事件，其中带有同一个 toolCallId。",
+      "harness 收到消息后开始处理 read_file 请求。第二步的 tool_execution_start 记录了这一步和 toolCallId。随后 harness 查找实现、检查参数，再调用工具读取文件。",
       "工具从本站虚拟 FS 读取文件并返回内容。第三步展示返回值；后续章节会说明它如何进入下一轮请求。模型回复由教学 provider 编排，Pi harness 与文件工具实际运行。"
     ],
     focus: ["provider", "harness", "tools"],

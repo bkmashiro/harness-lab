@@ -41,7 +41,7 @@ function getToolResults(messages: any[]) {
     text: typeof m.content === 'string' ? m.content : typeof m.output === 'string' ? m.output : JSON.stringify(m.content ?? m.output ?? ''),
   }));
 }
-function fixture(body: any, scenario: Settings['scenario']) {
+function fixture(body: any, scenario: Settings['scenario'], readPath = '/src/sum.js') {
   const messages = getMessages(body);
   const userText = messages.filter((m) => m?.role === 'user').map(textOf).join(' ');
   const all = userText;
@@ -52,6 +52,12 @@ function fixture(body: any, scenario: Settings['scenario']) {
   let call: {name:string;args:unknown}|undefined;
   let prose: string|undefined;
   if (scenario === 'provider-error') return { error: 'Simulated provider error', code: 'fixture_provider_error' };
+  if (scenario === 'read-once') {
+    const read = results.find(r=>r.name==='read_file');
+    if(read)return {prose:`read_file 返回：${read.text}`};
+    if(called('read_file'))return {mismatch:true as const};
+    return {call:{name:'read_file',args:{path:readPath}}};
+  }
   if (repairTask) {
     if (scenario === 'invalid-args' && (called('read_file') || results.some((r) => r.name === 'read_file' && /invalid|validation|error/i.test(r.text)))) {
       prose = '提供的 read_file 参数无效，未执行工具。';
@@ -199,7 +205,7 @@ export function createTransport(settings: Settings, emit: Emit, signal?: AbortSi
     }
     let body: any = {};
     try { body=JSON.parse(typeof details.body === 'string' ? details.body : '{}'); } catch {}
-    const result=fixture(body,settings.scenario);
+    const result=fixture(body,settings.scenario,settings.demoReadPath);
     if (settings.scenario === 'invalid-args' && 'call' in result && result.call) safeEmit('tools','fixture','Invalid tool arguments fixture',{tool:result.call.name,args:result.call.args});
     if ('error' in result) {
       const error=jsonResponse({error:{message:result.error,type:'fixture_error',code:result.code}},429);
