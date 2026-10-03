@@ -5,12 +5,16 @@ Executed locally on macOS with Node 26.7.0. No paid model calls, remote publicat
 ## Gates executed
 
 - `npm run check`: 0 errors, 0 warnings.
-- `npm test`: 29 tests passed across 5 files.
-- `npm run test:e2e`: 9 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
+- `npm test`: 34 tests passed across 6 files.
+- `npm run test:e2e`: 15 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
 - `npm run build`: passed, producing a static `dist/` tree.
 - `npm audit --omit=dev`: 0 vulnerabilities at dependency setup; lockfile is committed with the product.
 
 Browser coverage includes both protocols' complete repair flow, no external requests in default mode, 390px document overflow, malformed tool arguments, provider errors, actual failed test output, trace export without the configured key, non-stream single-call JSON, cancellation and live confirmation without sending.
+
+## Chapter-focused layout acceptance
+
+The original 1280×800 page had document height 2064px. It now uses two viewport panels with a top chapter selector and persistent controls. Default chapter 1 projects exactly three real events; other chapters select their own event IDs without renumbering. Full trace is opt-in. Browser tests cover 1280×800, 1440×900, 1024×768, 390×844 and 320×720; document bounds fit the viewport and settings/experiment controls remain reachable. Large payloads scroll within panels. Tests also verify JSON/Diff reachability, all reading paragraphs, and that the footer does not overlap the learning panel.
 
 ## Regression findings and fixes
 

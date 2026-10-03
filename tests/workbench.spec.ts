@@ -8,19 +8,24 @@ test('default simulation executes the real harness and exposes its trace', async
   await page.goto('/');
   await expect(page.getByTestId('system-diagram')).toBeVisible();
   await expect(page.getByTestId('run-status')).toContainText(/completed|完成/, {timeout:30000});
+  expect(await page.getByTestId('timeline-event').count()).toBe(3);
+  await page.getByTestId('full-trace-toggle').check();
   expect(await page.getByTestId('timeline-event').count()).toBeGreaterThan(15);
   await page.getByTestId('timeline-event').last().click();
+  await page.getByTestId('right-tab-data').click();
   await expect(page.getByTestId('inspector')).toBeVisible();
   await page.getByTestId('prev-button').click();
   await page.getByTestId('next-button').click();
   expect(errors).toEqual([]);
   expect(externalRequests).toEqual([]);
+  await page.getByTestId('right-tab-events').click();
   await page.getByTestId('timeline-event').filter({has:page.locator('.kind-chip').filter({hasText:/^write$/})}).click();
-  await page.getByRole('tab',{name:'Diff',exact:true}).click();
+  await page.getByTestId('right-tab-fs').click();
+  await page.getByTestId('file-diff-button').click();
   await expect(page.locator('.diff-view')).toContainText('return a - b');
   await expect(page.locator('.diff-view')).toContainText('return a + b');
   await page.evaluate(()=>window.scrollTo(0,0));
-  await page.screenshot({path:'docs/screenshots/workbench.png',fullPage:true});
+  await page.screenshot({path:'docs/screenshots/workbench-diff.png',fullPage:true});
 });
 
 test('Responses protocol also completes without a key', async ({ page }) => {
@@ -32,6 +37,8 @@ test('Responses protocol also completes without a key', async ({ page }) => {
   await page.getByTestId('settings-button').click();
   await page.getByTestId('run-button').click();
   await expect(page.getByTestId('run-status')).toContainText(/completed|完成/,{timeout:30000});
+  expect(await page.getByTestId('timeline-event').count()).toBe(3);
+  await page.getByTestId('full-trace-toggle').check();
   expect(await page.getByTestId('timeline-event').count()).toBeGreaterThan(15);
   await page.evaluate(()=>window.scrollTo(0,0));
 });

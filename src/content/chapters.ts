@@ -13,15 +13,15 @@ const raw = "https://raw.githubusercontent.com/earendil-works/pi/a13d35a742c6ef8
 export const chapters: Chapter[] = [
   {
     id: "overview",
-    title: "一次完整工作：从缺陷到修复",
-    subtitle: "先看清谁在做什么，再进入每个边界。",
+    title: "模型提议，谁来执行？",
+    subtitle: "只看一次 read_file：模型返回结构，harness 调用工具。",
     body: [
-      "场景是一份虚构 JavaScript 项目：sum(a, b) 错把加法写成了减法。用户要求先读文件、修复并运行测试。输入、初始文件和模型响应是教学夹具；harness、工具与测试实际执行，产生可检查的结果。这里没有调用真实模型。",
-      "一次成功工作可以拆成：用户消息进入 harness；harness 组装消息与工具声明并请求 provider；provider 产出助手消息，其中可能含工具调用；harness 检查调用并执行 read/edit/test；工具结果作为带调用 ID 的消息进入历史；如果调用没有终止这一轮，循环再次请求模型，最后输出答复。模型提出调用，不等于模型亲自读写文件。",
-      "在 Pi 固定版本中，runLoop 控制请求与轮次；executeToolCalls 负责调度；Agent 类持有可变对话状态并把事件归并到 state。实际工作目录、read/edit/bash 与 JSONL session 属于 coding-agent，不应统称为 agent-core 的内置功能。本站使用浏览器虚拟文件系统，这是本站适配器。"
+      "模型先返回一个结构化工具调用：read_file，参数是 /src/sum.js。此时文件还没有被读取。右侧第一步展示这条完整助手消息，找出调用的 name、arguments 和 id。",
+      "harness 收到完整消息后，找到 read_file 实现并检查参数，再调度它执行。右侧第二步是实际工具启动事件，带着同一个 toolCallId。这里开始接触执行环境，模型接口没有直接读取文件。",
+      "工具从本站虚拟 FS 取得文件内容并返回。第三步展示真实返回值，后续章节再解释它如何进入下一轮请求。本章仅有这三步；模型回复由教学 provider 编排，Pi harness 与文件工具实际运行。"
     ],
-    focus: ["user", "harness", "provider", "tools", "workspace"],
-    checkpoints: ["指出哪一条数据是用户输入、哪一条是工具结果。", "解释为什么工具调用之后通常还有一次模型请求。", "指出一个上游 core 事实和一个本站的模拟实现。"],
+    focus: ["provider", "harness", "tools"],
+    checkpoints: ["哪一步只是提出调用，哪一步开始读取文件？", "找出贯穿调用与结果的 toolCallId。", "这次工具读取的是浏览器虚拟 FS 还是用户磁盘？"],
     sources: [
       { label: "Pi agent-loop.ts：主循环与工具批次", url: `${raw}/packages/agent/src/agent-loop.ts` },
       { label: "Pi agent.ts：状态与生命周期封装", url: `${raw}/packages/agent/src/agent.ts` },

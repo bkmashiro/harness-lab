@@ -17,6 +17,6 @@ describe('curriculum evidence contracts',()=>{
     for(const source of sources.filter(s=>s.url.includes('earendil-works/pi'))){
       expect(source.url).toContain('a13d35a742c6ef8462812a28fbe1d8c8b7431c32');
     }
-    expect(chapters[0].body.join(' ')).toContain('加法写成了减法');
+    expect(chapters[0].body.join(' ')).toContain('本章仅有这三步');
   });
 });
