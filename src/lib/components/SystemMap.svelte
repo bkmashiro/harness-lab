@@ -43,7 +43,7 @@
       {#if visibleFlow.from!==visibleFlow.to}<path class="flow-link" d={`M${from.x} 59 Q${(from.x+to.x)/2} 13 ${to.x} 59`} marker-end="url(#chapter-flow)"/>{/if}
     {/if}
     {#if selected}
-      <g class="flow-tag" transform={`translate(${width/2},20)`}><title>{flow?.operation??selected.kind} · {payload(selected)}</title><rect x="-238" y="-12" width="476" height="25" rx="7"/><text text-anchor="middle" y="4">{flow?.operation??'查看真实事件'} · {payload(selected).slice(0,43)}</text></g>
+      <g class="flow-tag" transform={`translate(${width/2},20)`}><title>{flow?.operation??selected.kind} · {payload(selected)}</title><rect x="-238" y="-12" width="476" height="25" rx="7"/><text text-anchor="middle" y="4">{flow?.operation??'查看事件'} · {payload(selected).slice(0,43)}</text></g>
     {/if}
     {#each nodes as node}
       <g role="button" tabindex="0" aria-label={`选择 ${node.label} 最近的已发生事件`} class:current={activeLane===node.id} class:visited={!!latest(node.id)} class="map-node" transform={`translate(${node.x},${node.y})`} onclick={()=>selectLane(node.id)} onkeydown={(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectLane(node.id);}}}>
@@ -52,7 +52,7 @@
     {/each}
     <text class="caption" x="32" y="151">只展开本章相关参与者 · 实线对应操作，虚线表示结构关系</text>
   </svg>
-  {#if selected?.kind==='sse-frame'}<p>这是响应读取片段，可能含半个或多个 SSE 帧，不代表 token。</p>{/if}
+  {#if selected?.kind==='sse-frame'}<p>fetch 每次读取的响应片段可包含部分 SSE 帧，也可包含多个帧。</p>{/if}
 </div>
 <style>
 .system-map{width:100%;min-width:0}.system-map svg{display:block;width:100%;height:auto}.map-link{stroke:#b9cbc2;stroke-width:1.3;stroke-dasharray:4 4;fill:none}.flow-link{stroke:#16836b;stroke-width:2.4;fill:none}.map-node{cursor:pointer;outline:none}.map-node rect{fill:#fff;stroke:#d6e3dc}.map-node circle{fill:#a7bcb1}.map-node text{font:600 15px system-ui,sans-serif;fill:#243e36}.map-node .node-state{font:12px system-ui,sans-serif;fill:#7a8d83}.map-node.visited rect{stroke:#94beaa}.map-node.current rect{fill:#eef8f1;stroke:#16836b;stroke-width:1.8}.map-node.current circle{fill:#16836b}.map-node:focus rect{stroke:#4d71bf;stroke-width:2}.flow-tag rect{fill:#e9f4ed;stroke:#b7d5c3}.flow-tag text{font:12px system-ui,sans-serif;fill:#216d50}.caption{font:11px system-ui,sans-serif;fill:#7c9085}.system-map p{font-size:11px;color:#7c9085;margin:0 12px}

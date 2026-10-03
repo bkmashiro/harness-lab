@@ -3,9 +3,9 @@
 ## 定版与范围
 
 - 依据已确认的学习站设计。主场景是修复 JS `sum` 缺陷；课程分为全景、上下文、streaming、tools、loop、workspace/session、context management、failure、API lab 九章。
-- 实际依赖为 `@earendil-works/pi-agent-core@1.0.0` 与 `@earendil-works/pi-ai@1.0.0`。本工作区 `node_modules` 的 package metadata 确认包名、版本及源码仓库目录（`packages/agent`、`packages/ai`）；lockfile 指向 npm registry tarball。按安装时提供的 npm `gitHead`，本文件及课程引用固定至 `a13d35a742c6ef8462812a28fbe1d8c8b7431c32`，不再使用计划初查 SHA `a276dabe57911253350bffb93cb7d7aff6a73261`。
-- 当前 node_modules 仅有发布后的 dist；package metadata 未带 `gitHead`，lockfile 的 resolved URL 是 registry tarball。因此 lockfile 本身不能独立证明 tarball 与某 commit 的逐字节等价。本次按提供的 gitHead 定位并核对该 revision 下的原始源码链接；未比较 tarball 构建产物与源码。
-- 本文件记录源码/官方文档核对；后续运行验证见 [VERIFICATION.md](VERIFICATION.md)，不包含真实模型调用或完整 API 符合性认证。所有上游源码链接均不可变固定到 `a13d35a742c6ef8462812a28fbe1d8c8b7431c32`；行号只对应此版本。
+- 实际依赖为 `@earendil-works/pi-agent-core@1.0.0` 与 `@earendil-works/pi-ai@1.0.0`。本工作区 `node_modules` 的 package metadata 确认包名、版本和源码仓库目录（`packages/agent`、`packages/ai`）；lockfile 指向 npm registry tarball。根据安装时提供的 npm `gitHead`，本文及课程引用固定到 `a13d35a742c6ef8462812a28fbe1d8c8b7431c32`，而非计划初查的 SHA `a276dabe57911253350bffb93cb7d7aff6a73261`。
+- 当前 `node_modules` 只含发布后的 dist；metadata 未带 `gitHead`，lockfile 的 resolved URL 指向 registry tarball。因此 lockfile 不能单独证明 tarball 与某个 commit 逐字节等价。本次依据 npm 提供的 `gitHead` 定位并核对该 revision 的原始源码链接，未比较 tarball 构建产物与源码。
+- 本文件记录源码和官方文档核对；运行验证见 [VERIFICATION.md](VERIFICATION.md)。未进行真实模型调用或完整 API 符合性认证。上游源码链接固定到 `a13d35a742c6ef8462812a28fbe1d8c8b7431c32`，行号对应此版本。
 
 ## 固定 revision 符号映射
 
@@ -37,8 +37,8 @@
 - **上游 agent-core**：内存态 Agent、AgentMessage/事件、请求前 `transformContext`/`convertToLlm` seam、工具校验/hook/调度、steering/follow-up、abort。
 - **上游 pi-ai**：provider 统一类型、transcript 转换、Chat Completions / Responses 两类 adapter 和流解析。
 - **上游 coding-agent（高层包，不等同 core）**：read/edit/bash、工作目录文件操作、JSONL session/分支投影、compaction。
-- **本站教学实现**：sum 示例项目、脚本模型、浏览器虚拟 FS、Worker、快照/回放 UI、模拟 API 与故障注入。若用本地 fetch-compatible Response/SSE，只是本地回放，不代表访问远程 endpoint、发生真实网络传输或模型推理。
-- **验证边界**：真实 Pi 包、本站工具与生产浏览器路径已测试；mock fetch 覆盖授权和禁止重定向。未把 npm tarball 与源码逐字节比对，未发真实付费模型/API 请求，未验证第三方 CORS、实际认证或费用。上游 session/compaction 与多工具并发的完整交互演示未实现。没有声称观看模型内部推理；OpenAI 官方文档后续可能更新。
+- **本站教学实现**：sum 示例项目、脚本模型、浏览器虚拟 FS、Worker、快照/回放 UI、模拟 API 与故障注入。本地 transport 返回预设的 Response/SSE，供 adapter 解析和 harness 执行；远程请求由用户选择自己的 API 后发起。
+- **验证范围**：实际 Pi 包、本站工具和生产浏览器路径已测试；mock fetch 覆盖授权与禁止重定向。未逐字节比较 npm tarball 与源码，也未发送真实付费模型/API 请求，因此第三方 CORS、认证和费用行为尚未验证。产品未实现上游 session/compaction 与多工具并发的完整交互演示。课程展示可观察的事件和响应，不展示模型内部推理；OpenAI 官方文档可能更新。
 
 ## 章节文件
 

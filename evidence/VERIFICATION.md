@@ -24,12 +24,12 @@ The original 1280×800 page had document height 2064px. It now uses two viewport
 4. Returned messages and event file snapshots are scrubbed of the configured credential. Runtime tests cover user-message and file-snapshot echoes as well as exported trace coverage in the browser.
 5. A global `.workspace` layout selector also styled graph/legend elements bearing the workspace lane. Renamed the layout to `.workbench-layout`, keeping lane identities unchanged.
 
-## Honesty boundaries
+## Scope and limits
 
-- Provider model responses are authored fixtures. Protocols are consumed by the installed Pi adapters; the model itself is not real inference.
-- Test execution is a bounded arithmetic interpreter, not a complete JS engine. No eval or arbitrary program execution is exposed.
-- Mock-fetch tests verify live forwarding and authorization behavior, not compatibility or CORS of a third-party service.
-- Unexposed provider internals, network packets, token boundaries and private reasoning cannot be observed.
-- Session/compaction chapters explain fixed upstream source; this product does not run the complete coding-agent session/compaction implementation.
+- Provider responses are project-authored fixtures; installed Pi adapters handle the protocols, but no model inference occurs.
+- The teaching executor supports bounded arithmetic only; it does not run arbitrary JavaScript.
+- Mock-fetch tests cover live forwarding and authorization. Third-party compatibility and CORS remain untested.
+- Tests cannot observe provider internals, network packets, token boundaries, or private reasoning.
+- The session/compaction chapters explain a fixed upstream revision; this product does not run the complete coding-agent session/compaction implementation.
 
 Screenshots under `docs/screenshots/` come from production-browser acceptance runs, not design mockups. All 13 unique fixed-revision source paths used by the curriculum/inspector were checked with HTTP HEAD and returned 200.

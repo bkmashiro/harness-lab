@@ -13,12 +13,12 @@ const raw = "https://raw.githubusercontent.com/earendil-works/pi/a13d35a742c6ef8
 export const chapters: Chapter[] = [
   {
     id: "overview",
-    title: "模型提议，谁来执行？",
-    subtitle: "只看一次 read_file：模型返回结构，harness 调用工具。",
+    title: "从模型提议到工具执行",
+    subtitle: "一次 read_file 调用：模型提出请求，harness 启动工具。",
     body: [
-      "模型先返回一个结构化工具调用：read_file，参数是 /src/sum.js。此时文件还没有被读取。右侧第一步展示这条完整助手消息，找出调用的 name、arguments 和 id。",
-      "harness 收到完整消息后，找到 read_file 实现并检查参数，再调度它执行。右侧第二步是实际工具启动事件，带着同一个 toolCallId。这里开始接触执行环境，模型接口没有直接读取文件。",
-      "工具从本站虚拟 FS 取得文件内容并返回。第三步展示真实返回值，后续章节再解释它如何进入下一轮请求。本章仅有这三步；模型回复由教学 provider 编排，Pi harness 与文件工具实际运行。"
+      "模型先返回一个结构化工具调用：read_file，参数是 /src/sum.js。第一步展示完整助手消息，找出调用的 name、arguments 和 id。",
+      "harness 收到消息后，找到 read_file 实现、检查参数并启动工具。第二步展示实际工具启动事件，其中带有同一个 toolCallId。",
+      "工具从本站虚拟 FS 读取文件并返回内容。第三步展示返回值；后续章节会说明它如何进入下一轮请求。模型回复由教学 provider 编排，Pi harness 与文件工具实际运行。"
     ],
     focus: ["provider", "harness", "tools"],
     checkpoints: ["哪一步只是提出调用，哪一步开始读取文件？", "找出贯穿调用与结果的 toolCallId。", "这次工具读取的是浏览器虚拟 FS 还是用户磁盘？"],
@@ -31,14 +31,14 @@ export const chapters: Chapter[] = [
   {
     id: "context",
     title: "本轮模型看见什么",
-    subtitle: "持有的历史、转换后的上下文、线上请求不是同一个对象。",
+    subtitle: "历史消息经过转换，才成为发送给模型的请求内容。",
     body: [
-      "修复 sum.js 前，harness 可能把 system 指令、用户要求、先前助手消息、工具调用和工具结果都放进 transcript。Pi agent-loop 在每次请求前依次应用 transformContext（可选）、convertToLlm，再 normalizeContext；转换后的消息才交给 StreamFn。自定义 UI 消息可以被过滤或转换。",
-      "工具有两份不同身份：AgentContext.tools 是可执行实现；transcript system message 中的 toolsAdded/toolsRemoved 是对模型声明的工具接口。declareToolChanges 比较二者，在消息历史里记录声明变化。Provider adapter 再把归一化 transcript 序列化为某个 API 的请求格式。因此不要把 session 文件、Agent.state.messages、transform 后的消息、HTTP body 画成同一个共享列表。",
-      "transformContext 只是可配置钩子，代码注释给了裁剪旧消息示例，不代表 agent-core 自带自动裁剪、摘要或 compaction。Pi coding-agent 的会话/上下文策略属于更上层，具体触发和持久化应沿那一层单独核对。"
+      "修复 sum.js 前，harness 可能把 system 指令、用户要求、先前助手消息、工具调用和工具结果放进 transcript。Pi agent-loop 在每次请求前依次运行可选的 transformContext、convertToLlm 和 normalizeContext，再把转换后的消息交给 StreamFn。自定义 UI 消息可以被过滤或转换。",
+      "工具有两种身份：AgentContext.tools 保存可执行实现；transcript system message 中的 toolsAdded/toolsRemoved 记录发给模型的工具接口。declareToolChanges 比较两者，并在消息历史中记录声明变化。Provider adapter 随后把归一化 transcript 序列化为 API 请求。session 文件保存会话记录，Agent.state.messages 保存当前消息，转换步骤生成模型输入，adapter 再生成 HTTP body。",
+      "transformContext 是可配置钩子，代码注释以裁剪旧消息为例。agent-core 没有内置自动裁剪、摘要或 compaction。Pi coding-agent 在更上层实现会话与上下文策略，触发条件和持久化逻辑需检查对应代码。"
     ],
     focus: ["context", "provider", "harness", "session"],
-    checkpoints: ["按顺序说出 transformContext、convertToLlm、provider adapter。", "区分模型可见工具声明与 harness 可执行工具。", "为什么看到 state.messages 不足以证明请求 body 一模一样？"],
+    checkpoints: ["按顺序说出 transformContext、convertToLlm、provider adapter。", "区分模型可见工具声明与 harness 可执行工具。", "state.messages 经过哪些步骤才成为 HTTP body？"],
     sources: [
       { label: "Pi agent-loop.ts：请求边界", url: `${raw}/packages/agent/src/agent-loop.ts` },
       { label: "Pi types.ts：AgentMessage、AgentContext 与钩子契约", url: `${raw}/packages/agent/src/types.ts` },
@@ -48,15 +48,15 @@ export const chapters: Chapter[] = [
   },
   {
     id: "streaming",
-    title: "Streaming：增量数据，不是可执行半成品",
-    subtitle: "provider 字节、协议事件、Pi 事件、完整消息有不同边界。",
+    title: "Streaming：从增量事件到完整消息",
+    subtitle: "响应字节怎样解析成事件，再组成消息。",
     body: [
-      "流式回复先到的是增量。Pi agent-core 的 message_start/message_update/message_end 表达统一后的助手消息生命周期；内部 AssistantMessageEvent 还可区分 text_delta、thinking_delta、toolcall_delta 等。event.partial 是当时的部分消息，不应误当成已校验、可执行的最终调用。",
-      "以修复示例为例：toolCall 的 arguments 在流期间可能尚未收齐 JSON。agent-loop 等 provider 流结束并取得最终助手消息后，才筛选其 toolCall 内容并进入执行路径。Responses adapter 也会累积 function-call 参数，并要求 output_item.done 完成；若终止事件到达时调用仍有未完成缓冲，它报错而不把半截调用交给 harness。",
-      "协议帧边界不是网络 packet，也不保证一帧对应一个模型 token。展示 fetch 可读块、SSE event/data 和 Pi 归一化事件时，分层标注来源。截断（stopReason=length）尤其危险：本版本会把该助手消息中的工具调用全部变成错误结果，不执行可能不完整的参数。"
+      "流式回复以增量到达。Pi agent-core 的 message_start/message_update/message_end 表达统一后的助手消息生命周期；AssistantMessageEvent 还区分 text_delta、thinking_delta、toolcall_delta 等事件。event.partial 表示当前部分消息，最终调用要等消息完成并经过后续处理。",
+      "修复示例中的 toolCall arguments 可能还没收齐 JSON。agent-loop 等 provider 流结束、取得最终助手消息后，才筛选 toolCall 并进入执行路径。Responses adapter 会累积 function-call 参数，并等待 output_item.done；终止事件到达时若调用仍有未完成缓冲，adapter 会报错。",
+      "SSE 帧按 event/data 格式划分，fetch 每次读取的片段可能包含部分或多个帧。帧数与模型 token 数量没有固定对应关系，图中分别展示读取片段、协议事件和 Pi 事件。若 stopReason=length，本版本会把该助手消息中的工具调用转成错误结果，不执行可能不完整的参数。"
     ],
     focus: ["provider", "parser", "harness", "tools"],
-    checkpoints: ["区分原始 provider stream event 与 Pi AssistantMessageEvent。", "为什么不可收到一段看似合法的 JSON 就直接执行？", "Pi 收到 length 且消息含工具调用时如何处理？"],
+    checkpoints: ["区分原始 provider stream event 与 Pi AssistantMessageEvent。", "工具调用执行前还要完成哪些步骤？", "Pi 收到 length 且消息含工具调用时如何处理？"],
     sources: [
       { label: "Pi types.ts：统一事件和消息类型", url: `${raw}/packages/ai/src/types.ts` },
       { label: "Pi agent-loop.ts：增量事件归并与 length 分支", url: `${raw}/packages/agent/src/agent-loop.ts` },
@@ -68,11 +68,11 @@ export const chapters: Chapter[] = [
   {
     id: "tools",
     title: "Tool lifecycle：请求、校验、执行、回填",
-    subtitle: "工具调用是一条带身份和检查点的控制流，不是一段代码文本。",
+    subtitle: "工具调用沿着校验、执行和回填的控制流运行。",
     body: [
-      "助手消息中的工具调用带 id、name、arguments。Pi 根据 name 查找当前可执行工具，找不到就生成 error tool result；找到后可先 prepareArguments，再按工具 schema 验证，随后调用 beforeToolCall。被阻止、参数无效、工具抛错都形成错误结果，而不是把无效调用默默当成功。",
-      "执行接口收到 toolCallId、已验证参数、AbortSignal 和可选进度回调。afterToolCall 可以改写结果；最终 tool_execution_end 是 UI/观察事件，toolResult message 才是回填到 transcript 的模型输入，带 toolCallId/toolName/content/isError。结构化 details 供 UI 或程序使用，不等价于发给模型的 content。",
-      "sum.js 场景的 edit 工具究竟改了哪个文件、如何落盘，是执行环境适配器负责的事实。Pi coding-agent 的 edit.ts 使用文件操作、路径解析和变更队列；本站可能采用隔离的虚拟 FS，不能把它描述成上游 core 或真实 OS 文件操作。权限策略也应显示为实际接入的 hook/扩展，而非模型自动拥有或自动拒绝的能力。"
+      "助手消息中的工具调用带有 id、name 和 arguments。Pi 根据 name 查找当前可执行工具；找不到时生成 error tool result。找到后可先运行 prepareArguments，再按工具 schema 验证，随后调用 beforeToolCall。拦截、参数无效或工具抛错都会形成错误结果。",
+      "执行接口收到 toolCallId、已验证参数、AbortSignal 和可选进度回调。afterToolCall 可以改写结果；最终 tool_execution_end 是 UI/观察事件，toolResult message 才是回填到 transcript 的模型输入，带 toolCallId/toolName/content/isError。模型读取 content，UI 和程序还可以使用 details 中的结构化数据。",
+      "本站的 write_file 工具通过已实现的虚拟 FS 修改 sum.js。Pi coding-agent 的 edit.ts 则使用文件操作、路径解析和变更队列。权限策略由接入的 hook 或扩展实现。"
     ],
     focus: ["tools", "harness", "workspace"],
     checkpoints: ["列出工具从模型提议到回填 transcript 的阶段。", "tool_execution_end 和 toolResult message 分别服务谁？", "无效参数是否会触达工具 execute？"],
@@ -86,11 +86,11 @@ export const chapters: Chapter[] = [
   {
     id: "loop",
     title: "循环、并发与何时结束",
-    subtitle: "一次助手回答是 turn；agent run 可以包含多轮。",
+    subtitle: "一次助手回答构成一个 turn；一次 agent run 可以包含多轮。",
     body: [
-      "runLoop 的内层流程在有工具调用或待注入 steering message 时继续。每个正常 provider 回答会成为助手消息；若工具批次没有要求终止，tool result 被追加后会开启下一次请求。无工具且无 steering 时会检查 follow-up；finishTurn 可结束，也可要求一次后续 continuation。error/aborted 是硬退出分支。",
-      "Pi 默认工具批次并行，但每个调用的参数准备与 beforeToolCall 先按助手原始顺序完成；可执行的任务随后并发。tool_execution_end 按执行完成先后发出，tool result message 按助手消息中的工具调用顺序生成。顺序模式则逐一准备、执行、收尾。不要把屏幕上事件到达顺序误画成结果消息顺序。",
-      "steering 在当前助手 turn 的工具执行之后注入，不会跳过该助手已经请求的工具；follow-up 在 agent 原本将停止时处理。Agent 持有队列、AbortController 和运行态，abort 是取消信号，不承诺撤销已完成的文件写入或外部副作用。本站的时间轴回退应恢复教学快照，不声称撤消真实操作。"
+      "runLoop 的内层流程会在存在工具调用或待注入 steering message 时继续。每个正常 provider 回答都会成为助手消息；工具批次完成且未要求终止时，系统追加 tool result 并发起下一次请求。没有工具调用和 steering message 时，流程检查 follow-up；finishTurn 可以结束 turn，也可以要求一次 continuation。error/aborted 会直接退出。",
+      "Pi 默认并行执行工具批次。每个调用的参数准备和 beforeToolCall 按助手消息中的顺序完成，之后并发执行。tool_execution_end 按完成先后发出，tool result message 则按工具调用原顺序生成。顺序模式会逐个完成准备、执行和收尾。",
+      "steering message 在当前助手 turn 的工具执行后注入；follow-up 在 agent 原本将停止时处理。Agent 持有队列、AbortController 和运行态。abort 会发送取消信号，但已完成的文件写入和外部副作用不会因此自动撤销。本站时间轴回退展示当时的文件快照，运行后的工作区保持原状态。"
     ],
     focus: ["harness", "tools", "user", "provider"],
     checkpoints: ["并行任务的结束事件顺序和模型看到结果的顺序有何区别？", "steering 与 follow-up 在何时注入？", "取消后能否假定已经写入的文件会回滚？"],
@@ -102,15 +102,15 @@ export const chapters: Chapter[] = [
   },
   {
     id: "workspace-session",
-    title: "工作空间与 session：运行环境不等于对话",
-    subtitle: "文件系统、进程和可恢复的 session 是不同资源。",
+    title: "工作空间与 session：文件和消息状态",
+    subtitle: "文件系统、进程和 session 各自保存不同状态。",
     body: [
-      "read sum.js 得到的内容是一次工具结果；编辑后的 sum.js 是执行环境状态；用户/助手/工具消息组成对话上下文。三者有关联但不共享同一生命周期。重置可视化状态不会自动逆转已发生的文件写入。",
-      "固定 Pi revision 的 agent-core 定义 AgentMessage、工具调用和内存态 Agent；其核心循环没有内建 OS workspace 或持久 session manager。上层 coding-agent 才定义 read/edit/bash 等工具，并在 SessionManager 中把 session entries 追加为 JSONL、按父子 ID 形成分支、投影成会话上下文。恢复 session 的消息历史不等于恢复当时进程、外部服务或文件系统快照。",
-      "本站的浏览器虚拟 FS、测试 Worker，以及学习进度保存属于教学实现，不是 Pi 上游行为。若课程模拟“恢复”，应说明保存了哪些对象以及哪些状态未保存；运行任意用户代码也不能仅凭‘在 Worker 里’就宣称是通用安全沙箱。"
+      "read sum.js 的内容是工具结果；编辑后的 sum.js 属于执行环境状态；用户、助手和工具消息组成对话上下文。它们通过工具调用关联，各自有独立生命周期。重置可视化状态不会逆转已经写入的文件。",
+      "固定 Pi revision 的 agent-core 定义 AgentMessage、工具调用和内存态 Agent，核心循环不含 OS workspace 或持久 session manager。上层 coding-agent 定义 read/edit/bash 等工具，并由 SessionManager 将 session entries 追加为 JSONL、按父子 ID 建立分支，再投影成会话上下文。恢复消息历史不会同时恢复进程、外部服务或文件系统快照。",
+      "本站保存课程位置、prompt、虚拟文件与非密钥设置，恢复时读取这些数据。运行事件需另行导出。测试 Worker 解析受限算术函数，不执行任意用户程序。"
     ],
     focus: ["workspace", "session", "tools", "context"],
-    checkpoints: ["分别指出消息历史、文件内容和进程状态由谁持有。", "JSONL session 能证明磁盘文件已回滚吗？", "哪些浏览器适配属于本站而非上游 Pi？"],
+    checkpoints: ["分别指出消息历史、文件内容和进程状态由谁持有。", "恢复 JSONL session 会恢复哪些状态？", "哪些浏览器适配属于本站，哪些来自上游 Pi？"],
     sources: [
       { label: "Pi agent-core types.ts：AgentContext / AgentState", url: `${raw}/packages/agent/src/types.ts` },
       { label: "Pi coding-agent session-manager.ts：JSONL 条目与上下文投影", url: `${raw}/packages/coding-agent/src/core/session-manager.ts` },
@@ -120,14 +120,14 @@ export const chapters: Chapter[] = [
   {
     id: "context-management",
     title: "Context management：保留、裁剪或摘要都有代价",
-    subtitle: "有 hook 不代表有内置压缩；摘要也不是无损历史。",
+    subtitle: "agent-core 提供转换 hook；coding-agent 实现 compaction。",
     body: [
-      "模型上下文是每次请求前选择、转换并序列化的输入，不必等于完整 session。transformContext 是 agent-core 的可选转换 hook；convertToLlm 还负责过滤/映射消息。代码提供了实现方裁剪历史的扩展点，却不证明 core 会监控 token 阈值或自行生成摘要。",
-      "Pi coding-agent 有独立的 compaction 实现：根据 token 使用估算与配置阈值准备截断点，避开孤立的工具结果，再生成摘要并保留一段近期历史；SessionManager 记录 compaction 边界。这会压缩细节并改变后续模型看到的历史。它属于 coding-agent 的功能，不能倒推为 agent-core 默认行为。",
-      "sum.js 实验可对照“完整工具轨迹”与“只留文件结论/测试摘要”的上下文，标出被删去的失败信息和调用参数。课程演示的 token 计数若用启发式应注明估算；模型报告 usage 才是 provider 返回的用量，二者不可混写。"
+      "模型上下文是在每次请求前选择、转换并序列化的输入。transformContext 是 agent-core 的可选转换 hook；convertToLlm 负责过滤和映射消息。实现方可以通过这些扩展点裁剪历史，agent-core 本身不监控 token 阈值，也不自动生成摘要。",
+      "Pi coding-agent 单独实现了 compaction：它根据 token 使用估算和配置阈值选择截断点，避开孤立的工具结果，生成摘要并保留一段近期历史；SessionManager 记录 compaction 边界。压缩会删减细节，改变后续模型看到的历史。这是 coding-agent 的功能。",
+      "当前实验对照工具结果回填前后的两份请求，观察增加的消息、参数和结果。compaction 的摘要与近期历史如何组合，可查看本章源码。启发式 token 计数应标为估算，usage 表示 provider 返回的用量。"
     ],
     focus: ["context", "session", "harness", "provider"],
-    checkpoints: ["transformContext 存在能证明哪些事，不能证明哪些事？", "为什么压缩需要保留工具调用与结果的关联？", "区分 token 估算、上次 usage 与 provider 当前返回 usage。"],
+    checkpoints: ["transformContext 能做什么？哪些行为需检查其他代码？", "为什么压缩需要保留工具调用与结果的关联？", "区分 token 估算、上次 usage 与 provider 当前返回 usage。"],
     sources: [
       { label: "Pi agent-core types.ts：transformContext 契约", url: `${raw}/packages/agent/src/types.ts` },
       { label: "Pi coding-agent compaction.ts：压缩策略与估算", url: `${raw}/packages/coding-agent/src/core/compaction/compaction.ts` },
@@ -137,12 +137,12 @@ export const chapters: Chapter[] = [
   },
   {
     id: "failures",
-    title: "失败分支：把错误送回正确的边界",
-    subtitle: "错误、截断、取消和权限阻止不是一种状态。",
+    title: "失败分支：参数、工具与接口错误",
+    subtitle: "错误、截断、取消和权限拦截走不同分支。",
     body: [
-      "让测试暴露 sum.js 的加减法错误后，模型可能返回无效参数、未知工具、工具运行失败或错误的修复。Pi 在参数验证前不会调用 execute；验证、beforeToolCall 或执行抛错会转成 isError tool result，通常仍可作为下一轮上下文，让模型据此调整。工具拒绝策略来自已配置的 hook/工具，而非通用 harness 自动生成的权限体系。",
-      "provider 的 stopReason=error 或 aborted 会使主循环结束；length 表示达到输出限制。此固定版本在 length 回复里即便解析出 toolCall，也会对调用生成失败结果、不执行它们，因为看似完整的参数也可能来自被截断的 JSON。解析错误与业务测试失败应分开标识。",
-      "并行批次中某一调用失败不会自动代表其他副作用已经撤销；停止信号也只影响尊重 signal 的执行路径。浏览器 CORS/网络错误、HTTP 错误响应和 provider SSE 中的失败事件属于不同层级。故障注入和重试轨迹若由本站编排，标为教学情景，并避免伪装成实际 API 请求。"
+      "测试暴露 sum.js 的加减法错误后，模型可能返回无效参数、未知工具、运行失败或错误修复。Pi 先验证参数，再调用 execute；验证、beforeToolCall 或执行抛错都会转成 isError tool result，通常会进入下一轮上下文供模型调整。工具拒绝策略由已配置的 hook 或工具实现。",
+      "provider 返回 stopReason=error 或 aborted 时，主循环结束；length 表示达到输出限制。此固定版本遇到 length 时，会为消息中的 toolCall 生成失败结果并跳过执行，因为参数可能是截断的 JSON。解析错误和业务测试失败应分别标识。",
+      "并行批次中，一个调用失败不会撤销其他调用已产生的副作用；停止信号只影响遵守 signal 的执行路径。浏览器 CORS/网络错误、HTTP 错误响应和 provider SSE 失败事件属于不同层级。本站编排的故障注入和重试轨迹应标为教学情景。"
     ],
     focus: ["harness", "parser", "tools", "provider"],
     checkpoints: ["坏参数在哪里拒绝？工具抛错如何回到对话？", "stopReason=length 时为什么不执行已出现的 tool call？", "哪些失败可以从 API 响应看到，哪些只能看到浏览器网络错误？"],
@@ -155,16 +155,16 @@ export const chapters: Chapter[] = [
   },
   {
     id: "api-lab",
-    title: "API 实验室：协议不同，语义映射也不同",
-    subtitle: "Chat Completions 与 Responses 不是只差一个 URL。",
+    title: "API 实验室：两种请求和响应格式",
+    subtitle: "Chat Completions 与 Responses 使用不同的请求和事件结构。",
     body: [
       "Pi 内部先把上下文整理成统一 transcript；adapter 再转换成各 API 的 wire format。Chat Completions 通常向 POST /chat/completions 发送 messages 数组，工具声明位于 tools；助手工具调用在 assistant.tool_calls 中，参数是 JSON 字符串。工具结果以 role=tool 的消息回传，并用 tool_call_id 对应调用。非流式返回是 completion 的 choices/message；流式则是带 choices[].delta 的 chat.completion.chunk，常以 data: [DONE] 结束。",
-      "Responses 向 POST /responses 发送 input（字符串或 items/messages），工具声明也放 tools，但调用输出是 function_call item，使用 call_id、name、arguments；工具结果是 function_call_output item，以 call_id 关联。非流式主体含 response id/status/output items；流式使用有类型的事件，如 response.created、response.output_item.added、response.function_call_arguments.delta、response.output_item.done、response.completed。不要把它压平成 Chat Completions 的 delta/message 结构。",
-      "两种协议都可能支持 streaming 和工具调用，但字段、结果归属、终止标记、增量事件不同。Pi 的两个 adapter 都做消息/工具转换并把 provider 事件归一化成 AssistantMessageEvent。官方文档描述的是服务端协议；本站模拟 transport 若直接返回预编排 Response 或 SSE，仅展示 adapter 的解析与 harness 行为，必须注明没有远程 HTTP 调用。",
-      "教学 API trace 应依次可检查：归一化 transcript → adapter request body → Response status/headers → 原始可读字节/SSE event → JSON/event parser → Pi 统一事件 → 最终消息与工具调用 ID → 工具结果回填 → 下一请求。浏览器可见的读取块不是网络 packet；API key、TLS 内部和未公开推理不属于可观察数据。实时 BYOK 应由用户主动发起；本章引用文档而不发送收费请求。"
+      "Responses 向 POST /responses 发送 input（字符串或 items/messages），工具声明也放在 tools。调用以 function_call item 输出，包含 call_id、name、arguments；工具结果是通过 call_id 关联的 function_call_output item。非流式主体含 response id/status/output items；流式使用有类型的事件，如 response.created、response.output_item.added、response.function_call_arguments.delta、response.output_item.done、response.completed。",
+      "两种协议都支持 streaming 和工具调用，但字段、结果归属、终止标记和增量事件各不相同。Pi 的两个 adapter 转换消息与工具，并将 provider 事件归一化为 AssistantMessageEvent。官方文档描述服务端协议；本站模拟 transport 直接返回预编排 Response 或 SSE，用来展示 adapter 解析和 harness 行为，不会发起远程 HTTP 调用。",
+      "教学 API trace 可依次检查：归一化 transcript → adapter request body → Response status/headers → 原始可读字节/SSE event → JSON/event parser → Pi 统一事件 → 最终消息与工具调用 ID → 工具结果回填 → 下一请求。trace 记录浏览器可读的响应片段和解析结果，API key 始终隐藏；TLS 内部和未公开的模型推理无法获取。实时 BYOK 由用户主动发起；本章只引用文档，不发送收费请求。"
     ],
     focus: ["provider", "parser", "context", "tools", "harness"],
-    checkpoints: ["两种协议分别在哪里携带工具结果？关联键是什么？", "Chat stream chunk 与 Responses SSE event 在结构上有什么不同？", "本地模拟 Response 能否证明访问过 OpenAI？为什么？"],
+    checkpoints: ["两种协议分别在哪里携带工具结果？关联键是什么？", "Chat stream chunk 与 Responses SSE event 在结构上有什么不同？", "沿请求记录判断当前使用的是本地模拟还是远程 provider。"],
     sources: [
       { label: "Pi OpenAI Completions adapter", url: `${raw}/packages/ai/src/api/openai-completions.ts` },
       { label: "Pi OpenAI Responses adapter", url: `${raw}/packages/ai/src/api/openai-responses.ts` },

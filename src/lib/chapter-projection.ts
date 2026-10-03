@@ -27,7 +27,7 @@ export function projectChapter(chapterId:string,all:TraceEvent[]):ChapterProject
    const raw=all.filter(e=>inFirstResponse(e)&&e.kind==='sse-frame');
    const parsed=all.filter(e=>inFirstResponse(e)&&e.kind==='stream_event');
    add(raw[0]);add(raw[1]);add(parsed[0]);add(parsed.find(e=>JSON.stringify(e.data).includes('arguments')));add(parsed.at(-1));add(call);
-   note='选取第一条工具调用响应的读取片段、解析事件和完整消息；不是整轮日志，也不把读取片段当 token。';break;
+   note='本章展示第一条工具调用的响应片段、解析事件和最终消息。每个读取片段可能包含一个 SSE 帧的部分内容或多个帧。';break;
   }
   case 'tools':{
    const writeCall=first(e=>assistantCall(e,'write_file')) ?? call;
@@ -40,10 +40,10 @@ export function projectChapter(chapterId:string,all:TraceEvent[]):ChapterProject
   }
   case 'loop':
    add(firstSerialized);add(call);add(firstToolEnd);add(first(e=>e.kind==='turn_end'));add(nextSerialized);
-   note='只看一次循环边界：工具结果怎样进入下一轮请求。';break;
+   note='跟随一次循环，查看工具结果怎样进入下一轮请求。';break;
   case 'workspace-session':
    add(first(e=>e.kind==='workspace_init'));add(first(e=>e.kind==='read'));add(first(e=>e.kind==='write'));add(first(e=>e.kind==='test'));
-   note='对照同一文件的读写快照。这里展示本站虚拟 FS，不冒充上游 session 恢复。';break;
+   note='对照同一文件读写前后的快照。文件保存在浏览器虚拟 FS 中；上游 session 恢复机制见本章源码说明。';break;
   case 'context-management':
    add(firstSerialized);add(nextSerialized);
    note='对比工具结果加入前后的两份真实请求。当前未执行上游 compaction；压缩算法只在源码说明中解读。';break;
@@ -52,7 +52,7 @@ export function projectChapter(chapterId:string,all:TraceEvent[]):ChapterProject
    if(!chosen.length)note='当前运行没有失败事件。可在实验中选择无效参数、Provider 错误或测试未通过，再观察对应边界。';break;
   case 'api-lab':
    add(firstSerialized);add(firstRequest);add(first(e=>e.kind==='response'));add(first(e=>e.kind==='sse-frame'));add(first(e=>e.kind==='api_test_result'));
-   note='只展示接口边界；单次 JSON/SSE 实验可从设置页发起。';break;
+   note='查看请求体和接口响应。设置页提供单次 JSON/SSE 实验。';break;
   default:note='此章节没有可用的事件投影。';
  }
  chosen.sort((a,b)=>a.seq-b.seq);

@@ -1,8 +1,8 @@
 # Harness Lab
 
-一个纯静态、中文的 Agent harness 交互学习工作台。课程采用视口内双列布局：左侧讲当前机制并显示局部图解，右侧切换数据、虚拟 FS、事件和源码。章节通过顶部选择器切换，没有常驻目录。每章从同一份真实运行中选取相应事件，完整 trace 只在主动打开实验视图后展示。
+一个纯静态的中文 Agent harness 交互学习工作台。课程采用视口内双列布局：左侧讲解当前机制并显示局部图解，右侧查看数据、虚拟文件系统、事件与源码。章节通过顶部选择器切换，不设常驻目录。每章从同一次实际运行中选取相应事件；完整 trace 需主动打开实验视图查看。
 
-默认模型响应由浏览器内模拟 provider 编排，**Pi harness、provider adapter、工具校验与教学测试实际执行**。无 API key、无远程请求。自由探索可切换自己的兼容 API。
+默认响应来自浏览器内的模拟 provider；Pi harness、provider adapter、工具校验和教学测试均实际运行。默认模式不需要 API key，也不发送远程请求。自由探索时可改用自己的兼容 API。
 
 ![运行工作台](docs/screenshots/workbench.png)
 
@@ -29,13 +29,13 @@ npm run test:e2e
 
 ## Cloudflare Pages
 
-在 Pages 中选择静态站构建：
+Cloudflare Pages 构建设置：
 - 构建命令：`npm run build`
 - 输出目录：`dist`
 - Node.js：22.19 或更新版本
 - 无 Pages Functions、无后台代理、无服务器密钥环境变量。
 
-模型设置由访问者在浏览器填写。本站章节切换没有客户端 URL 路由，不需要自定义重写规则。尚未执行 CF Pages 部署；部署后的第三方 API CORS 需使用实际 Pages origin 验证。
+模型设置由访问者在浏览器填写。本站章节切换不使用客户端 URL 路由，无需自定义重写规则。Cloudflare Pages 尚未部署；部署后须通过实际 Pages origin 验证第三方 API 的 CORS。
 
 ## 可以学习什么
 
@@ -55,7 +55,7 @@ npm run test:e2e
 
 配置 base URL、model、协议与 API key。单次 API 实验支持 SSE / 非流式 JSON、实际请求预览和响应观测；它不执行工具。完整 agent 使用 Pi 的流式 adapter，并把每轮工具结果重新提交给模型。
 
-模拟 provider 支持正常修复、无效工具参数、provider 错误、真实失败测试。它不是通用模型，不理解任意任务；不匹配的请求明确失败。用量和延迟是模拟设定。
+模拟 provider 覆盖正常修复、无效工具参数、provider 错误和真实失败测试。它只处理这些教学场景，不支持任意任务；其他请求会明确失败。用量和延迟为模拟设定。
 
 真实 API：
 - 必须主动点击并确认费用与发送内容，不在页面打开时请求。
@@ -66,9 +66,9 @@ npm run test:e2e
 
 ## 执行边界
 
-虚拟文件系统完全在浏览器中，不读写用户磁盘。教学执行器是受限算术解释器：只支持形如 `export function sum(a, b) { return a + b; }` 的函数，运算符可为 `+ - * /`。它不使用 eval，也不是完整 JavaScript VM。Worker 用于隔离和终止，不宣称通用安全沙箱。
+虚拟文件系统只在浏览器中运行，不读写用户磁盘。教学执行器是受限算术解释器，只接受形如 `export function sum(a, b) { return a + b; }` 的函数，支持 `+ - * /` 运算符。执行器不调用 eval，也不支持完整 JavaScript；Worker 隔离并可终止执行，但不构成通用安全沙箱。
 
-本版没有 Python、通用终端、MCP、多 agent 执行器或上游 coding-agent session 恢复。相关章节明确区分源码机制与本站功能。
+本版不含 Python、通用终端、MCP、多 agent 执行器或上游 coding-agent session 恢复；相关章节分别说明上游源码机制和本站功能。
 
 ## 参照与证据
 

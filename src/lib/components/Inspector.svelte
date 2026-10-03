@@ -56,7 +56,7 @@
     <button class:active={tab==='diff'} role="tab" aria-selected={tab==='diff'} onclick={() => tab='diff'}>Diff</button>
     <button class:active={tab==='source'} role="tab" aria-selected={tab==='source'} onclick={() => tab='source'}>源码</button>
   </div>{/if}
-  {#if !event}<div class="inspector-empty"><span>⌁</span><b>选择一条运行事件</b><p>检查器会跟随所选时间点更新。未发生的文件状态不会提前显示。</p></div>
+  {#if !event}<div class="inspector-empty"><span>⌁</span><b>选择一条运行事件</b><p>选择事件后，可以查看当时的数据和文件快照。</p></div>
   {:else if tab==='summary'}
     <div class="inspector-content"><div class="event-summary"><span class="summary-kind">{event.kind}</span><h3>{event.title}</h3><p>{event.lane} 通道 · 序号 {event.seq}</p></div><div class="inspect-section"><span class="eyebrow">事件信息</span><dl><div><dt>事件 ID</dt><dd>{event.id}</dd></div><div><dt>通道</dt><dd>{event.lane}</dd></div><div><dt>时间</dt><dd>{new Date(event.at).toLocaleTimeString('zh-CN')}</dd></div><div><dt>来源</dt><dd>{sourceRef?.label ?? event.source ?? '运行时事件'}</dd></div></dl></div><div class="inspect-section"><span class="eyebrow">数据摘要</span><pre class="data-preview">{JSON.stringify(event.data, null, 2)}</pre></div></div>
   {:else if tab==='json'}
@@ -66,7 +66,7 @@
   {:else if tab==='diff'}
     <div class="inspector-content"><div class="inspect-kicker">与前一状态逐行比较 · {selectedFile}</div>{#if fileNames().length}<div class="file-picker">{#each fileNames() as filename}<button class:chosen={selectedFile===filename} onclick={() => selectedFile=filename}>{filename}</button>{/each}</div><div class="diff-view" aria-label="文件差异">{#each diffLines(before,after) as line}<div class:added={line.kind==='added'} class:removed={line.kind==='removed'} class="diff-line"><span>{line.kind==='added'?'+':line.kind==='removed'?'-':' '}</span><code>{line.text || ' '}</code></div>{/each}</div><div class="diff-legend"><span class="removed-text">− before</span><span class="added-text">+ after</span></div>{:else}<div class="mini-empty">该事件未携带文件快照。</div>{/if}</div>
   {:else}
-    <div class="inspector-content"><div class="inspect-kicker">固定版本源码定位</div>{#if sourceRef}{#if sourceRef.url}<a class="source-ref" href={sourceRef.url} target="_blank" rel="noreferrer">↗ {sourceRef.label}</a>{:else}<div class="source-ref">{sourceRef.label}</div>{/if}<p class="source-pin">{#if sourceRef.url}Pi 仓库固定提交 <code>{sourceCommit.slice(0,12)}</code> · 路径按事件来源映射{:else}本站实现说明 · 本地运行时源码不作为可点击外链{/if}</p><pre class="source-note">源码仅作为定位链接；事件内容按纯文本显示，不会动态加载或执行。</pre>{:else}<div class="mini-empty">此事件没有源码引用。</div>{/if}</div>
+    <div class="inspector-content"><div class="inspect-kicker">固定版本源码定位</div>{#if sourceRef}{#if sourceRef.url}<a class="source-ref" href={sourceRef.url} target="_blank" rel="noreferrer">↗ {sourceRef.label}</a>{:else}<div class="source-ref">{sourceRef.label}</div>{/if}<p class="source-pin">{#if sourceRef.url}Pi 仓库固定提交 <code>{sourceCommit.slice(0,12)}</code> · 路径按事件来源映射{:else}本站实现 · 源码位于仓库 src/lib 目录{/if}</p><pre class="source-note">链接指向事件对应的源码版本。事件内容以文本显示。</pre>{:else}<div class="mini-empty">此事件没有源码引用。</div>{/if}</div>
   {/if}
   <div class="inspector-foot"><span><i></i> 事件快照</span><span>{event ? '已同步' : '无数据'}</span></div>
 </div>
