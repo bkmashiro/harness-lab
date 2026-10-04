@@ -151,7 +151,7 @@
       <p class="unit-goal">{unit.goal}</p>
       {#if unit.id === 'introduction'}
         <div class="overview-grid"><div><h2>学习目标</h2><ul>{#each firstModule.objectives as objective}<li>{objective}</li>{/each}</ul></div><div><h2>前置知识</h2><ul>{#each firstModule.prerequisites as prerequisite}<li>{prerequisite}</li>{/each}</ul></div></div>
-        <p class="lesson-copy">{firstModule.description}</p>
+        <p class="intro-copy">{firstModule.description}</p><p><a href="/build-harness/">动手实验：从零编写自己的 Harness →</a></p>
         <h3>六个单元的路线</h3><ol class="route-list">{#each moduleUnits as item}<li><b>{item.title}</b><span>{item.goal}</span></li>{/each}</ol>
       {/if}
       {#each unit.blocks as rawBlock}

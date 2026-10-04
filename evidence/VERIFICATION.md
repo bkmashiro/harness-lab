@@ -5,8 +5,8 @@ Executed locally on macOS with Node 26.7.0. Model/runtime verification used loca
 ## Gates executed
 
 - `npm run check`: 0 errors, 0 warnings.
-- `npm test`: 51 tests passed across 9 files.
-- `npm run test:e2e`: 23 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
+- `npm test`: 92 tests passed across 12 files.
+- `npm run test:e2e`: 28 Chromium browser tests passed against the production static build (Vite preview), including file Diff.
 - `npm run build`: passed, producing a static `dist/` tree.
 - `npm audit --omit=dev`: 0 vulnerabilities at dependency setup; lockfile is committed with the product.
 
@@ -40,7 +40,15 @@ Browser verification uses a fresh Vite preview server with strict port selection
 
 ## Typography
 
-The preview now uses an 1840px maximum content width, 18px body text and 16px code. A 220,360-byte self-hosted subset of Noto Sans Mono CJK SC covers the current course text. The course and preview share this font; explicit Chinese sans-serif fallbacks replace the generic monospace fallback. Chromium platform-font inspection confirmed that mixed Latin/Chinese code uses the custom Harness family. Tests also check 1920px landscape usage and 390px reflow. The font asset is prebuilt; deployment has no new Python or external-font dependency.
+The preview now uses an 1840px maximum content width, 18px body text and 16px code. A 240,988-byte self-hosted subset of Noto Sans Mono CJK SC covers the current course text. The course and preview share this font; explicit Chinese sans-serif fallbacks replace the generic monospace fallback. Chromium platform-font inspection confirmed that mixed Latin/Chinese code uses the custom Harness family. Tests also check 1920px landscape usage and 390px reflow. The font asset is prebuilt; deployment has no new Python or external-font dependency.
+
+## From-zero Harness workshop
+
+`/build-harness/` adds nine chapters with editable starter scripts and working solutions. The reference is a separate zero-dependency JavaScript implementation; it does not call Pi's Agent. All nine complete solutions pass Node and actual browser execution checks; all nine unfinished starters fail their completion checks. A complete Responses solution is also exercised. The downloadable Node demo completed the read/write/three-test/final-answer task in four model turns.
+
+Browser isolation checks demonstrate an opaque Worker origin, no host localStorage, blocked network requests, timeout termination with no remaining Worker, stop/retry and draft/progress persistence. The runner distinguishes its own observations from learner-emitted labels. Host timeout/default output limits are documented in the workshop README; these are teaching limits rather than a hostile-code memory VM guarantee.
+
+Actual HTTP adapter tests use local mock responses, including independently checked arguments/call IDs, malformed and truncated responses, HTTP errors and a mocked live-entry CLI with an echoed credential scrubbed from output. No real paid API call was made. Browser workshop HTTP is non-streaming and local; the downloaded live entry accepts user environment configuration.
 
 ## Scope and limits
 

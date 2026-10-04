@@ -6,7 +6,7 @@
 - Copyright: © 2014–2021 Adobe.
 - License: SIL Open Font License 1.1, copied in `LICENSE.noto.txt`.
 - Derived family: `Harness Code Mono`.
-- Current artifact: 220,360 bytes, 1,050 codepoints.
+- Current artifact: 240,988 bytes, 1,116 codepoints.
 
 `code-fonts.css` is shared by the existing course and design preview. Missing glyphs use explicitly named Chinese sans-serif fonts, with a final sans-serif fallback. Both font and stylesheet are served from this site; no external font request is made at runtime.
 

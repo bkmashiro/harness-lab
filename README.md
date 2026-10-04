@@ -37,6 +37,17 @@ Cloudflare Pages 构建设置：
 
 模型设置由访问者在浏览器填写。本站章节切换不使用客户端 URL 路由，无需自定义重写规则。部署后须通过实际 Pages origin 验证第三方 API 的 CORS。
 
+## 从零编写自己的 Harness
+
+访问部署站点的 **`/build-harness/`**。九章从消息结构开始，逐步写出 provider 调用、工具注册与参数检查、单次分发、多轮循环、虚拟工作区、错误回填、停止条件和 HTTP adapter。
+
+每章包含详细讲解、具体代码、可编辑起始脚本、可运行解答、行为检查和复习题。浏览器实际执行你编辑的 JavaScript，可查看返回值、消息历史、事件和文件；完成记录与草稿留在本机浏览器。默认模拟 provider 不产生模型费用。
+
+完整参考代码是零依赖 JavaScript，和 Pi 解读模块分开。页面提供下载包，解压后直接运行 `node demo.mjs`；`live.mjs` 可在自己的终端通过环境变量连接 Chat Completions 或 Responses 服务。
+
+- [参考实现与运行说明](public/build-harness/reference/README.md)
+- [浏览器执行与限制](src/build-harness/README.md)
+
 ## 章节版式预览
 
 部署后的 `/design/learning-layouts.html` 提供三页独立预览：请求字段拆解、执行步骤、文件前后对比。它使用采集的 Pi 运行数据，控件放在对应例子附近，正文和代码保持固定字号。现有课程暂不替换，先确认各类内容的呈现方式。预览正文 18px、代码 16px，横屏内容区最大 1840px。站内代码使用自托管的中英等宽字体，详见 [字体说明](public/fonts/README.md)。

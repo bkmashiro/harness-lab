@@ -15,9 +15,9 @@ source = args.cache / "NotoSansMonoCJKsc-Regular.otf"
 if not source.exists():
     urllib.request.urlretrieve(SOURCE, source)
 chars = set("const 请求 = \"读取\"; // 中文注释")
-for folder in [ROOT / "src", ROOT / "public" / "design"]:
+for folder in [ROOT / "src", ROOT / "public" / "design", ROOT / "public" / "build-harness"]:
     for path in folder.rglob("*"):
-        if path.suffix in {".ts", ".svelte", ".html", ".json", ".md"}:
+        if path.suffix in {".ts", ".svelte", ".html", ".json", ".md", ".mjs"}:
             chars.update(path.read_text(encoding="utf-8"))
 chars.update((ROOT / "README.md").read_text(encoding="utf-8"))
 unicodes = set(map(ord, chars))
